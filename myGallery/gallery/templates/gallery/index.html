@@ -1,0 +1,25 @@
+{% extends 'gallery/base.html' %}
+
+{% block content %}
+    <div style="background: rgba(0, 0, 0, 0.8); padding: 1rem; border-radius: 20px; box-shadow: 0px 10px 20px black; margin-top: 1rem;">
+        <center >
+            <h1 style="color: white;">Welcome to Your Gallery {{user.first_name}}</h1>
+            <p style="color: white;">{{msg}}</p>
+            <br><br>
+            {% if user.is_authenticated %}
+                {% if images_exist %}
+                <a href="{% url 'gallery:imagecarousel' %}">
+                    <button class="btn btn-success" style="border: 2px dotted yellow; font-size: 24px;">Start a Gallery Session</button>
+                </a>
+
+                {% else %}
+                    <p>Upload Images to Start a Gallery Session.</p>
+                {% endif %}
+                <br><br>
+                <a href="{% url 'gallery:mygallery' %}">
+                    <button class="btn btn-light">Start Uploading Images</button>
+                </a>
+            {% endif %}
+        </center>
+    </div>
+{% endblock %}

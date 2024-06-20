@@ -1,0 +1,45 @@
+{% extends 'gallery/base.html' %}
+
+{% block content %}
+    
+    <center>
+        <title>Adding an image</title>
+        <div class="container shadow p-4 mb-5 bg-body rounded mt-5">
+            <h1>Add an image</h1>
+            {% if submitted %}
+                <h2>Your image has been added!</h2>
+                <br>
+                <div>
+                    <a href="{% url 'gallery:addimage' %}">
+                        <button type="button" class="btn btn-success">Upload Another Image</button>
+                    </a>
+                </div>
+                <br>
+                <div>
+                    <a href="{% url 'gallery:mygallery' %}">
+                        <button type="button" class="btn btn-secondary">Back to My Gallery</button>
+                    </a>
+                </div>
+
+            {% else %}
+                <form method = POST enctype="multipart/form-data" style="width: 50%;">
+                    {% csrf_token %}
+                    {{ form.as_p }}
+                    <input type="submit" value="Submit" class="btn btn-info">
+                </form>
+                
+                <br>
+                <div>
+                    <a href="{% url 'gallery:mygallery' %}">
+                        <button type="button" class="btn btn-dark">Back to My Gallery</button>
+                    </a>
+                </div>
+            {% endif %}
+            
+        </div>
+    </center>
+    <br>
+
+   
+    
+{% endblock %}

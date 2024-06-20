@@ -1,0 +1,75 @@
+{% comment %} <nav class="navbar navbar-expand-lg" style="background-color: #b3fff0">
+    <a class="navbar-brand"  style="margin-left: 1rem;" href="{% url 'gallery:index' %}">Home</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNavDropdown">
+      <ul class="navbar-nav">
+        {% if user.is_authenticated %}
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'gallery:mygallery' %}">My Gallery</a>
+        </li>
+        {% endif %}
+
+        {% if user.is_authenticated %}
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'sitemembers:userlogout' %}">Logout</a>
+          </li>
+        {% else %}
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'sitemembers:registeruser' %}">Register</a>
+        </li>
+        
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'sitemembers:userlogin' %}">Login</a>
+        </li>
+        {% endif %}
+      </ul>
+      <div>
+        <form class="d-flex" role="search" method = POST enctype="multipart/form-data" action = "{% url 'gallery:searchimages' %}">
+          {% csrf_token %}
+          <input class="form-control me-2" type="search" placeholder="Search Images" aria-label="Search" name="imagesearch">
+          <button class="btn btn-outline-dark" type="submit">Search</button>
+        </form>
+      </div>
+    </div>
+  </nav> {% endcomment %}
+
+<nav class="navbar navbar-expand-lg bg-body-tertiary">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="{% url 'gallery:index' %}">Home</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+          {% if user.is_authenticated %}
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'gallery:mygallery' %}">My Gallery</a>
+          </li>
+          {% endif %}
+  
+          {% if user.is_authenticated %}
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'sitemembers:userlogout' %}">Logout</a>
+            </li>
+          {% else %}
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'sitemembers:registeruser' %}">Register</a>
+          </li>
+          
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'sitemembers:userlogin' %}">Login</a>
+          </li>
+          {% endif %}
+        </ul>
+        {% if user.is_authenticated %}
+        <form class="d-flex" role="search" method = POST enctype="multipart/form-data" action = "{% url 'gallery:searchimages' %}">
+          {% csrf_token %}
+          <input class="form-control me-2" type="search" placeholder="Search Images" aria-label="Search" name="imagesearch">
+          <button class="btn btn-outline-dark" type="submit">Search</button>
+        </form>
+        {% endif %}
+      </div>
+    </div>
+  </nav>

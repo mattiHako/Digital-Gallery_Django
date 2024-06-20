@@ -1,0 +1,198 @@
+{% extends 'gallery/base.html' %}
+{% block content %}
+<style>
+
+    .centerPage {
+        display: flex;
+        justify-content: center;
+        padding: 0.5rem;
+    }
+
+   .hidden {
+        display: none;
+    } 
+
+</style>
+    <div class="container shadow p-4 mb-5 bg-body rounded mt-5">
+    {% if user.is_authenticated %}
+    
+        <br>
+        
+            <center>
+                <h2>Gallery Page</h2>
+                <br>
+                <div>
+                    <div class="container">
+                        <div>
+                            <a href="{% url 'gallery:addimage' %}">
+                                <button type="button" class="btn btn-primary">Upload an Image</button>
+                            </a>
+                        </div>
+                        <br>
+                    </div>
+                    {% comment %} Modaali kansion luonnille {% endcomment %}
+                    <div class="modal fade" id="folderModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                        <div class="modal-dialog">
+                          <div class="modal-content">
+                            <div class="modal-header">
+                              <h1 class="modal-title fs-5" id="exampleModalLabel">Name your Folder</h1>
+                              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <form method = POST action="{% url 'gallery:addfolder' %}" enctype="multipart/form-data" style="width: 50%;">
+                                    {% csrf_token %}
+                                    {{ folderform.as_p }}
+                                    <input type="submit" value="Submit" class="btn btn-info">
+                                </form>
+                            </div>
+                            <div class="modal-footer">
+                              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            </div>
+                          </div>
+                        </div>
+                      </div> 
+                    </div>
+                
+            </center>
+            <div>
+                <button type="button" style="margin: 1rem;" class="btn btn-danger" id="toggleDeleteBtn" style="position: absolute;">Delete Content</button>
+            </div>
+            <div class="container" style="border: 2px solid black;">
+                
+                <div class="row">
+                    
+                    
+
+                    {% for folder in folders %}
+                    <div class="col-6 col-sm-6 col-md-3 col-lg-2 mb-4 mt-4">
+                        <div class="card" style="margin: 0.5rem; text-align: center; background-color: #e2a11d;">
+                            <a href="{% url 'gallery:myfolder' folder.id %}" style="text-decoration: none; color: inherit;">
+                                <i class="bi bi-folder" class="card-img-top" style="font-size: 2rem;"></i>
+                                <div class="card-body">
+                                <p class="card-text">{{folder.name}}</p>
+                                </div>
+                            </a>
+                            
+                        </div>
+                        <div class="centerPage">
+                            <a href="{% url 'gallery:deletefolder' folder.id %}" class="btn btn-outline-danger delete-btn hidden" onclick="return confirmDelete();" > Delete </a>
+                        </div> 
+                    </div>
+                    {% empty %}
+                    <p>No gallery folders created.</p>
+ 
+                    {% endfor %}
+                    <div>
+                        <button type="button" class="btn btn-primary" href="{% url 'gallery:addfolder' %}" style="margin: 0.5rem;" 
+                                data-bs-toggle="modal" data-bs-target="#folderModal">Create a Gallery Folder</button>
+                    </div>
+                    
+                    {% for image in images %}
+                    
+                    <div class="col-6 col-sm-6 col-md-3 col-lg-2 mb-4 mt-4">
+                        <a href="{% url 'gallery:editimage' image.id %}" class="centerPage">
+                            <button class="btn btn-secondary">Edit</button>
+                        </a>
+                        <div class="centerPage">
+                            <a href="#" data-bs-toggle="modal" 
+                            data-bs-target="#imageModal" 
+                            data-img-url="{{ image.image.url }}" 
+                            data-img-title="Title: {{ image.image_title }}"
+                            data-img-description="{{ image.description }}">
+                                <img class="rounded float-start" src="{{image.thumbnail.url}}" alt="image.description">
+                                
+                            </a>
+                            
+                            
+                        </div>
+                        
+                        <div class="centerPage">
+                            <a href="{% url 'gallery:deleteimage' image.id %}" class="btn btn-outline-danger delete-btn hidden" onclick="return confirmDelete();"  > Delete </a>
+                        </div>
+                        
+                        
+                    </div>
+                    
+                    {% endfor %}
+        
+                </div>
+            </div>
+    </div>
+
+    {% comment %} Modaali, millä näytetään isompi kuva klikkaamalla thumbnailia. {% endcomment %}
+    <div class="modal fade" id="imageModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="imageModalLabel" style="padding: 1rem;"></h5>
+                    
+                    <button type="button" class="btn btn-dark" data-bs-dismiss="modal" aria-label="Close" style="position: absolute; right: 1rem;">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    
+                </div>
+                <div class="modal-body">
+                    <img src="" id="modalImage" class="img-fluid" alt="Responsive image" >
+                </div>
+                <h5 class="modal-footer" style="padding: 1rem;"></h5>
+                <h5 class="modal-user" style="padding: 1rem;"></h5>
+            </div>
+        </div>
+    </div>
+
+    
+
+    {% comment %} Javascript thumbnailien klikkaamiseen {% endcomment %}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const thumbnailLinks = document.querySelectorAll('a[data-img-url]');
+            thumbnailLinks.forEach(function(link) {
+                link.addEventListener('click', function(event) {
+                    const imgUrl = event.currentTarget.getAttribute('data-img-url');
+                    const title = event.currentTarget.getAttribute('data-img-title');
+                    const description = event.currentTarget.getAttribute('data-img-description');
+
+                    const modalTitle = document.querySelector('#imageModal .modal-title');
+                    const modalDescription = document.querySelector('#imageModal .modal-footer');
+
+                    modalTitle.textContent = title;
+                    modalDescription.textContent = description;
+
+                    const modalImage = document.getElementById('modalImage');
+                    modalImage.src = imgUrl;
+                });
+            });
+        });
+
+        
+        //Jätin vain muistoksi, tässä siis vanha funktio deletoinnin varmistukselle.
+        function confirmDelete() {
+            // Show a confirmation dialog
+            const confirmed = confirm('Are you sure?');
+            // If the user clicked 'OK', confirmed will be true; otherwise, false
+            return confirmed;
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Your existing code for thumbnails...
+        
+            const toggleDeleteBtn = document.getElementById('toggleDeleteBtn');
+            toggleDeleteBtn.addEventListener('click', function() {
+                const deleteButtons = document.querySelectorAll('.delete-btn');
+                deleteButtons.forEach(function(button) {
+                    button.classList.toggle('hidden');
+                });
+            });
+        });
+    </script>
+    
+        {% else %}
+            <div class="container">
+                <br>
+                <h1> You have to login to view this page. </h1>
+                <a href="{% url 'sitemembers:userlogin' %}">Login</a>
+            </div>
+    {% endif %}
+
+{% endblock %}
+

@@ -1,0 +1,25 @@
+{% extends 'gallery/base.html' %}
+
+{% block content %}
+
+
+<div class="container shadow p-4 mb-5 bg-body rounded mt-5">
+    {% if form.errors %}
+    
+    <div class="alert alert-warning" role="alert">
+        Your form has an error!
+    </div>
+    
+    {% endif %}
+    <h1>Register User</h1>
+    <br>
+    <div >
+        <form action="{% url 'sitemembers:registeruser' %}" method = POST>
+            {% csrf_token %}
+            {{ form.as_p }}
+            <br>
+            <input type="submit" value="Submit" class="btn btn-info">
+        </form>
+    </div>
+</div>
+{% endblock %}

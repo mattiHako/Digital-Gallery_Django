@@ -1,0 +1,17 @@
+{% extends 'gallery/base.html' %}
+
+{% block content %}
+    <br>
+    <div class="container shadow p-4 mb-5 bg-body rounded mt-5">
+        <a href="{% url 'gallery:mygallery' %}">
+            <button type="button" class="btn btn-secondary" onclick="history.back()">Go Back</button>
+        </a>
+        <br><br>
+        <h1>Edit Image Information</h1>
+        <form action="" method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <br>
+            <input type="submit" value="Update" class="btn btn-info">
+    </div>
+{% endblock %}

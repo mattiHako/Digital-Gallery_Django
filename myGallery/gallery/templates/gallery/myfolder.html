@@ -1,0 +1,142 @@
+{% extends 'gallery/base.html' %}
+{% block content %}
+<style>
+    .centerPage {
+        display: flex;
+        justify-content: center;
+        padding: 0.5rem;
+    }
+
+    .hidden {
+        display: none;
+    } 
+   
+</style>
+    
+    <div class="container shadow p-4 mb-5 bg-body rounded mt-5">
+        <div>
+            <a href="{% url 'gallery:mygallery' %}">
+                <button type="button" class="btn btn-secondary" onclick="history.back()">Go Back</button>
+            </a>
+        </div>
+        <div>
+            <a href="{% url 'gallery:addimagefolder' folder.id %}">
+                <button type="button" class="btn btn-primary">Upload an Image</button>
+            </a>
+        </div>
+    {% if user.is_authenticated %}
+        
+        <br>
+        
+            
+            <center>
+                <h2>{{folder.name}}</h2>
+            </center>
+            <div class="row" style="margin: 1rem;">
+                <div>
+                    <button type="button" style="margin: 1rem;" class="btn btn-danger" id="toggleDeleteBtn" style="position: absolute;">Delete Content</button>
+                </div>
+                <div class="row"  style="border: 2px solid black;">
+                    
+                    {% for image in images %}
+                    
+                    <div class="col-6 col-sm-6 col-md-3 col-lg-3 mb-4 mt-4">
+                        <a href="{% url 'gallery:foldereditimage' image.id folder.id %}" class="centerPage">
+                            <button class="btn btn-secondary">Edit</button>
+                        </a>
+                        <div class="centerPage">
+                            <a href="#" data-bs-toggle="modal" 
+                            data-bs-target="#imageModal" 
+                            data-img-url="{{ image.image.url }}" 
+                            data-img-title="Title: {{ image.image_title }}"
+                            data-img-description="{{ image.description }}">
+                            
+                                <img class="rounded float-start" src="{{image.thumbnail.url}}" alt="image.image_title">
+                            </a>
+                        </div>
+                        
+                        <div class="centerPage">
+                            <a href="{% url 'gallery:deleteimage' image.id %}" class="btn btn-outline-danger delete-btn hidden" onclick="return confirmDelete();"> Delete </a>
+                        </div>
+                        
+                    </div>
+                    {% empty %}
+                    <p>No images in this folder.</p>
+                    
+                    {% endfor %}
+                </div>
+            </div>
+    </div>
+
+    {% comment %} Modaali, millä näytetään isompi kuva klikkaamalla thumbnailia. {% endcomment %}
+    <div class="modal fade" id="imageModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="imageModalLabel" style="padding: 1rem;"></h5>
+                    <button type="button" class="btn btn-dark" data-bs-dismiss="modal" aria-label="Close" style="position: absolute; right: 1rem;">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    
+                </div>
+                <div class="modal-body">
+                    <img src="" id="modalImage" class="img-fluid" alt="Responsive image">
+                </div>
+                <h5 class="modal-footer" style="padding: 1rem;"></h5>
+                <h5 class="modal-user" style="padding: 1rem;"></h5>
+            </div>
+        </div>
+    </div>
+
+    {% comment %} Javascript thumbnailien klikkaamiseen {% endcomment %}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const thumbnailLinks = document.querySelectorAll('a[data-img-url]');
+            thumbnailLinks.forEach(function(link) {
+                link.addEventListener('click', function(event) {
+                    const imgUrl = event.currentTarget.getAttribute('data-img-url');
+                    const title = event.currentTarget.getAttribute('data-img-title');
+                    const description = event.currentTarget.getAttribute('data-img-description');
+
+                    const modalTitle = document.querySelector('#imageModal .modal-title');
+                    const modalDescription = document.querySelector('#imageModal .modal-footer');
+
+                    modalTitle.textContent = title;
+                    modalDescription.textContent = description;
+                    
+                    const modalImage = document.getElementById('modalImage');
+                    modalImage.src = imgUrl;
+                });
+            });
+        });
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Your existing code for thumbnails...
+        
+            const toggleDeleteBtn = document.getElementById('toggleDeleteBtn');
+            toggleDeleteBtn.addEventListener('click', function() {
+                const deleteButtons = document.querySelectorAll('.delete-btn');
+                deleteButtons.forEach(function(button) {
+                    button.classList.toggle('hidden');
+                });
+            });
+        });
+
+        function confirmDelete() {
+            // Show a confirmation dialog
+            const confirmed = confirm('Are you sure you want to delete this image?');
+            // If the user clicked 'OK', confirmed will be true; otherwise, false
+            return confirmed;
+        }
+    </script>
+    
+        {% else %}
+            <div class="container">
+                <br>
+                <h1> You have to login to view this page. </h1>
+                <a href="{% url 'sitemembers:userlogin' %}">Login</a>
+            </div>
+    {% endif %}
+
+{% endblock %}
+
